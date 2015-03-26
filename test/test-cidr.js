@@ -25,7 +25,7 @@ describe('CIDR List', function() {
         expect(results.length).to.equal(256);
     });
 
-    it('should return a list of 256 IPs for /24 block', function() {
+    it('should return a list of 65, 536 IPs for /16 block', function() {
         var block = '127.0.0.0/16';
         var results = cidr.list(block);
         expect(results.length).to.equal(65536);
