@@ -1,12 +1,10 @@
-var php = require('phpjs');
-var math = Math;
-
 var Calculator = require( 'ip-subnet-calculator' );
 
-var Subnet = function(ips) {
+var Subnet = function() {
     this.blocks = {};
     this.ranges = [];
-    this.ips = ips;
+    this.ips = null;
+    this.filtered = false;
 };
 
 /**
@@ -17,7 +15,7 @@ var Subnet = function(ips) {
  * @returns {Object}
  */
 var parse = function(ip) {
-    var tmp = ip.split('.')
+    var tmp = ip.split('.');
 
     return {
         ip: ip,
@@ -62,8 +60,10 @@ var hash = function(ip) {
  * 127.0.0.0, 127.0.0.1, 127.0.0.2, etc
  * @returns {Subnet}
  */
-Subnet.prototype.filter = function(ips, bits) {
-    this.ips = ips || this.ips;
+Subnet.prototype.filter = function(ips) {
+    if (ips) {
+        this.ips = ips;
+    }
 
     if (!(this.ips instanceof Array) || this.ips.length <= 0) {
         return this;
@@ -77,8 +77,6 @@ Subnet.prototype.filter = function(ips, bits) {
     }
 
     var previous = parse(ips.shift());
-
-    console.log(previous);
 
     block.call(this, previous.key, previous.ip);
 
@@ -102,6 +100,8 @@ Subnet.prototype.filter = function(ips, bits) {
         previous = current;
     }
 
+    this.filtered = true;
+
     return this;
 };
 
@@ -111,9 +111,17 @@ Subnet.prototype.filter = function(ips, bits) {
  *
  * @returns {Array}
  */
-Subnet.prototype.getBlocks = function() {
+Subnet.prototype.getRanges = function(ips) {
+    if (ips) {
+        this.ips = ips;
+    }
+
     if (this.ranges.length > 0) {
-        return this.blocks;
+        return this.ranges;
+    }
+
+    if (!this.filtered) {
+        this.filter();
     }
 
     for (var i in this.blocks) {
@@ -137,65 +145,3 @@ Subnet.prototype.getBlocks = function() {
 };
 
 var subnet = new Subnet();
-exports.Subnet = Subnet;
-exports.filter = subnet.filter.bind(subnet);
-exports.getBlocks = subnet.getBlocks.bind(subnet);
-
-
-/**
- * Returns the range or the start and end
- * IPs for a given cidr block.
- *
- * @param cidr
- * @returns {Objects}
- */
-exports.range = function(cidr) {
-    if (!(cidr.indexOf('/') > -1)) {
-        return null;
-    }
-
-    var range = {};
-    var parts = cidr.split('/');
-
-    if ((parts[1] > 32)) {
-        return null;
-    }
-
-    range.start = php.long2ip((php.ip2long(parts[0])) & ((-1 << (32 - +parts[1]))));
-    range.end = php.long2ip((php.ip2long(parts[0])) + math.pow(2, (32 - +parts[1])) - 1);
-
-    return range;
-};
-
-/**
- * Returns a contiguous list of ips
- * within a given cidr block.
- * @param cidr
- * @returns {Array}
- */
-exports.list = function(cidr) {
-    if (typeof (cidr) === 'undefined') {
-        return null;
-    }
-
-    var range = exports.range(cidr);
-
-    if (!range) {
-        return null;
-    }
-
-    var ip2long = php.ip2long;
-    var long2ip = php.long2ip;
-    var list = [];
-    var index = 0;
-    var startLong = ip2long(range.start);
-    var endLong = ip2long(range.end);
-
-    list[index++] = range.start;
-
-    while((startLong++ < endLong)) {
-        list[index++] = long2ip(startLong);
-    }
-
-    return list;
-};

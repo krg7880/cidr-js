@@ -1,33 +1,28 @@
 var chai = require('chai');
 var expect = chai.expect;
-var cidr = require(__dirname + '/../index');
+var CIDR = require(__dirname + '/../src/index');
 
-describe('CIDR Range', function() {
+describe('cidr.range()', function() {
     it('should return the same start and end range', function() {
         var block = '127.0.0.0/32';
+        var cidr = new CIDR();
         var results = cidr.range(block);
         expect(results.start).to.equal(results.end);
     });
 
     it('should return the same two distinct ips', function() {
         var block = '127.0.0.0/31';
+        var cidr = new CIDR();
         var results = cidr.range(block);
         expect(results.start).to.not.equal(results.end);
         expect(results.start).to.equal('127.0.0.0');
         expect(results.end).to.equal('127.0.0.1');
     });
-});
 
-describe('CIDR List', function() {
-    it('should return a list of 256 IPs for /24 block', function() {
-        var block = '127.0.0.0/24';
+    it('should return null with invalid CIDR /33', function() {
+        var block = '127.0.0.0/33';
+        var cidr = new CIDR();
         var results = cidr.list(block);
-        expect(results.length).to.equal(256);
-    });
-
-    it('should return a list of 65, 536 IPs for /16 block', function() {
-        var block = '127.0.0.0/16';
-        var results = cidr.list(block);
-        expect(results.length).to.equal(65536);
+        expect(results).to.equal(null);
     });
 });
