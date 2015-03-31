@@ -1,1 +1,1 @@
-module.exports = require(__dirname + '/src/cidr');
+module.exports = require(__dirname + '/src/index');
