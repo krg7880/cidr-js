@@ -1,6 +1,11 @@
 # cidr-js
 Node module for for expanding cidr blocks in a list of IP (a-z) or just the range (start &amp; end)
 
+## Install
+```bash
+npm install cidr-js
+```
+
 ## Example Usage
 Get just the start and end IPs
 

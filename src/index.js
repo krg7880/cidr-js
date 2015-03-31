@@ -125,6 +125,8 @@ CIDR.prototype.filter = function(ips) {
         return null;
     }
 
+    ips.sort();
+
     var results = {};
 
     if (ips.length === 1) {
