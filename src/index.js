@@ -96,8 +96,7 @@ var convertAndSort = function(ips) {
     var current = null;
 
     for (var i=0; i<len; i++) {
-        current = ips[
-            i];
+        current = ips[i];
         if (current) {
             ips[i] = _ip2long(current);
         }
