@@ -6,23 +6,10 @@ var long2ip = php.long2ip;
 var math = Math;
 var Calculator = require( 'ip-subnet-calculator' );
 
-var CIDR = function CIDR() {};
-
-/**
- * Parses the given IP to get the
- * last 8 bytes for testing if
- * the IPs are contigous
- * @param ip
- * @returns {Object}
- */
-var parse = function(ip) {
-    var tmp = ip.split('.')
-
-    return {
-        ip: ip,
-        decimal: Calculator.toDecimal(ip),
-        key: tmp.splice(0, 3).join('')
-    };
+var CIDR = function CIDR() {
+    if (!(this instanceof CIDR)) {
+        return new CIDR();
+    }
 };
 
 /**
@@ -42,17 +29,6 @@ var block = function(collection, key, ip) {
     }
 
     collection[key].push(ip);
-};
-
-/**
- * Convert the IP to a
- * string of numbers.
- *
- * @param ip
- * @returns {string}
- */
-var hash = function(ip) {
-    return ip.split('.').join('');
 };
 
 /**
@@ -80,8 +56,8 @@ CIDR.prototype.range = function(ip) {
 };
 
 /**
- * Returns a contiguous list of
- * ips within the range of a
+ * Returns a list of
+ * ip values within the range of a
  * given cidr block.
  *
  * @param ip
@@ -114,52 +90,75 @@ CIDR.prototype.list = function(ip) {
     return list;
 };
 
+var convertAndSort = function(ips) {
+    var len = ips.length;
+    var _ip2long = ip2long;
+    var current = null;
+
+    for (var i=0; i<len; i++) {
+        current = ips[
+            i];
+        if (current) {
+            ips[i] = _ip2long(current);
+        }
+    }
+
+    ips = ips.sort();
+    return ips;
+}
+
 /**
  * Filter the array by grouping
  * IPs where all 32 bits are contiguous
  * 127.0.0.0, 127.0.0.1, 127.0.0.2, etc
- * @returns {Array}
+ * @returns {Object}
  */
 CIDR.prototype.filter = function(ips) {
     if (!(ips instanceof Array) || ips.length <= 0) {
         return null;
     }
 
-    ips.sort();
+    ips = convertAndSort(ips);
 
+    var key = 0;
+    var cont = true;
+    var len = ips.length;
+    var previous = null;
+    var current = null;
+    var next = null;
     var results = {};
 
     if (ips.length === 1) {
-        return block(results, hash(ips[0]), ips[0]);
+        return block(results, 0, long2ip(ips[0]));
     }
 
-    var previous = parse(ips.shift());
-
-    block(results, previous.key, previous.ip);
-
-    var len = ips.length;
-
     for (var i=0; i<len; i++) {
-        var current = parse(ips[i]);
+        current = ips[i];
+        next = ips[i+1];
+        previous = current;
 
-        if ((current.decimal - previous.decimal) === 1) {
-            block(results, current.key, ips[i]);
-        } else if (ips[(i+1)]) {
-
-            var next = parse(ips[(i+1)]);
-            if ((next.decimal - current.decimal) === 1) {
-
-                block(results, current.key, ips[i]);
-            } else {
-
-                block(results, hash(current.ip), current.ip);
-            }
-        } else {
-
-            block(results, hash(current.ip), current.ip);
+        if (!cont) {
+            key += 1;
         }
 
-        previous = current;
+        if (next) {
+            if ((next - current) === 1) {
+                block(results, key, long2ip(current));
+                cont = true;
+            } else {
+                block(results, key, long2ip(current));
+                cont = false;
+            }
+        } else {
+            if (previous) {
+                if ((current - previous) === 1) {
+                    block(results, key, long2ip(current));
+                    cont = true;
+                } else {
+                    block(results, ++key, long2ip(current));
+                }
+            }
+        }
     }
 
     return results;

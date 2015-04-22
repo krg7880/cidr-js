@@ -1,6 +1,6 @@
 {
   "name": "cidr-js",
-  "version": "2.1.1",
+  "version": "2.2.1",
   "description": "Utility for expanding cidr blocks in a list of IPs",
   "main": "index.js",
   "directories": {

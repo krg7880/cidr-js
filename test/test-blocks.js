@@ -1,7 +1,7 @@
 var chai = require('chai');
 var expect = chai.expect;
+var ips = require(__dirname + '/fixtures/ips').ips;
 var CIDR = require(__dirname + '/../src/index');
-var ips = require(__dirname + '/fixtures/ips');
 
 /**
  * @link http://winterofdiscontent.net/IPSubnetCalculator/
@@ -9,7 +9,7 @@ var ips = require(__dirname + '/fixtures/ips');
 describe('cidr.getBlocks()', function() {
     it('should return 6 results', function(done) {
         var cidr = new CIDR();
-        var results = cidr.getBlocks(ips);
+        var results = cidr.getBlocks(ips.slice());
 
         expect(results.length).to.equal(6);
         expect((results.indexOf('127.0.0.0/30') > -1)).to.equal(true);
@@ -20,7 +20,7 @@ describe('cidr.getBlocks()', function() {
         expect((results.indexOf('127.0.1.2/31') > -1)).to.equal(true);
 
         // verify our dangler is included as a single IP
-        expect((results.indexOf(ips[(ips.length-1)]) > -1)).to.equal(true);
+        expect((results.indexOf('127.0.1.5') > -1)).to.equal(true);
 
         return done();
     });
