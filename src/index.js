@@ -3,7 +3,7 @@
 var php = require('phpjs');
 var ip2long = php.ip2long;
 var long2ip = php.long2ip;
-var math = require('mathjs');
+var math = Math;
 var Calculator = require( 'ip-subnet-calculator' );
 
 var CIDR = function CIDR() {
@@ -49,8 +49,9 @@ CIDR.prototype.range = function(ip) {
         return null;
     }
 
-    range.start = long2ip((ip2long(parts[0])) & ((-1 << (32 - +parts[1]))));
-    range.end = long2ip((ip2long(parts[0])) + math.pow(2, (32 - +parts[1])) - 1);
+    var start = ip2long(parts[0])
+    range.start = long2ip(start & ((-1 << (32 - +parts[1]))));
+    range.end = long2ip(start + math.pow(2, (32 - +parts[1])) - 1);
     range.max = 1 << (32 - parts[1]);
 
     var total = (ip2long(range.end) - ip2long(range.start));
