@@ -90,7 +90,6 @@ CIDR.prototype.list = function(ip) {
     var index = 0;
     var startLong = _ip2long(range.start);
     var endLong = _ip2long(range.end);
-    
     list[index++] = range.start;
 
     while((startLong++ < endLong)) {
