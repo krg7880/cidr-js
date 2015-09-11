@@ -25,4 +25,12 @@ describe('cidr.range()', function() {
         var results = cidr.list(block);
         expect(results).to.equal(null);
     });
+
+    it('should return range 255.255.142.64-255.255.142.79', function() {
+        var block = '255.255.142.72/28';
+        var cidr = new CIDR();
+        var results = cidr.range(block);
+        expect(results.start).to.equal('255.255.142.64');
+        expect(results.end).to.equal('255.255.142.79');
+    });
 });
