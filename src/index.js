@@ -50,7 +50,7 @@ CIDR.prototype.range = function(ip) {
     }
 
     range.start = long2ip((ip2long(parts[0])) & ((-1 << (32 - +parts[1]))));
-    range.end = long2ip((ip2long(parts[0])) + math.pow(2, (32 - +parts[1])) - 1);
+    range.end = long2ip((ip2long(range.start)) + math.pow(2, (32 - +parts[1])) - 1);
 
     return range;
 };
