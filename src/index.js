@@ -1,6 +1,6 @@
 'use strict';
 
-var php = require('phpjs');
+var php = require('locutus/php/network')
 var ip2long = php.ip2long;
 var long2ip = php.long2ip;
 var math = Math;
