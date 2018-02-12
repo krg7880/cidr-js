@@ -127,10 +127,6 @@ CIDR.prototype.filter = function(ips) {
     var next = null;
     var results = {};
 
-    if (ips.length === 1) {
-        return block(results, 0, long2ip(ips[0]));
-    }
-
     for (var i=0; i<len; i++) {
         current = ips[i];
         next = ips[i+1];
